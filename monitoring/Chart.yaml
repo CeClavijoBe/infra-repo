@@ -7,6 +7,6 @@ appVersion: "1.0"
 
 dependencies:
   - name: victoria-metrics-k8s-stack
-    version: 0.18.15
+    version: 0.45.0
     repository: https://victoriametrics.github.io/helm-charts/
     condition: victoria-metrics-k8s-stack.enabled
