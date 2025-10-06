@@ -1,0 +1,123 @@
+victoria-metrics-k8s-stack:
+  enabled: true
+
+  # VictoriaMetrics Single (VM Single en lugar de cluster para simplicidad)
+  vmsingle:
+    enabled: true
+    spec:
+      retentionPeriod: "7d"
+      storage:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+      resources:
+        requests:
+          cpu: 200m
+          memory: 512Mi
+        limits:
+          cpu: 1000m
+          memory: 1Gi
+    ingress:
+      enabled: false
+
+  # VMAgent - Recolector de métricas (reemplaza a Prometheus)
+  vmagent:
+    enabled: true
+    spec:
+      selectAllByDefault: true
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+
+  # VMAlert - Sistema de alertas (reemplaza a Alertmanager)
+  vmalert:
+    enabled: true
+    spec:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 256Mi
+
+  # Grafana - Visualización
+  grafana:
+    enabled: true
+    adminPassword: "admin" # CAMBIAR en producción
+    service:
+      type: NodePort
+      nodePort: 30080
+    persistence:
+      enabled: true
+      size: 5Gi
+    datasources:
+      datasources.yaml:
+        apiVersion: 1
+        datasources:
+          - name: VictoriaMetrics
+            type: prometheus
+            url: http://vmsingle-monitoring-stack-victoria-metrics-k8s-stack.monitoring.svc:8429
+            access: proxy
+            isDefault: true
+    dashboardProviders:
+      dashboardproviders.yaml:
+        apiVersion: 1
+        providers:
+          - name: "default"
+            orgId: 1
+            folder: ""
+            type: file
+            disableDeletion: false
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/default
+    dashboards:
+      default:
+        kubernetes-cluster:
+          gnetId: 7249
+          revision: 1
+          datasource: VictoriaMetrics
+        node-exporter:
+          gnetId: 1860
+          revision: 31
+          datasource: VictoriaMetrics
+
+  # Exporters para métricas del clúster
+  prometheus-node-exporter:
+    enabled: true
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 128Mi
+
+  kube-state-metrics:
+    enabled: true
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+
+  # Configuración de ServiceMonitors
+  defaultRules:
+    create: true
+    rules:
+      kubernetesApps: true
+      kubernetesResources: true
+      kubernetesStorage: true
+      kubernetesSystem: true
+
+  # Configuración adicional para scraping
+  additionalVictoriaMetricsMap: {}
