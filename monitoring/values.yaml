@@ -1,6 +1,9 @@
 victoria-metrics-k8s-stack:
   enabled: true
-  
+
+  # Acortar nombres para evitar el límite de 63 caracteres
+  fullnameOverride: "vm-stack"
+
   # VictoriaMetrics Single (VM Single en lugar de cluster para simplicidad)
   vmsingle:
     enabled: true
@@ -109,5 +112,4 @@ victoria-metrics-k8s-stack:
       kubernetesSystem: true
 
   # Configuración adicional para scraping
-  additionalVictoriaMetricsMap:
-    {}
+  additionalVictoriaMetricsMap: {}
