@@ -7,19 +7,19 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-
+  
   source:
     repoURL: https://github.com/CeClavijoBe/app-repo
     targetRevision: main
-    path: chart/my-app
+    path: my-app-chart
     helm:
       valueFiles:
         - values.yaml
-
+  
   destination:
     server: https://kubernetes.default.svc
     namespace: default
-
+  
   syncPolicy:
     automated:
       prune: true
