@@ -1,6 +1,6 @@
 victoria-metrics-k8s-stack:
   enabled: true
-
+  
   # VictoriaMetrics Single (VM Single en lugar de cluster para simplicidad)
   vmsingle:
     enabled: true
@@ -66,28 +66,17 @@ victoria-metrics-k8s-stack:
             url: http://vmsingle-monitoring-stack-victoria-metrics-k8s-stack.monitoring.svc:8429
             access: proxy
             isDefault: true
-    dashboardProviders:
-      dashboardproviders.yaml:
-        apiVersion: 1
-        providers:
-          - name: "default"
-            orgId: 1
-            folder: ""
-            type: file
-            disableDeletion: false
-            editable: true
-            options:
-              path: /var/lib/grafana/dashboards/default
-    dashboards:
-      default:
-        kubernetes-cluster:
-          gnetId: 7249
-          revision: 1
-          datasource: VictoriaMetrics
-        node-exporter:
-          gnetId: 1860
-          revision: 31
-          datasource: VictoriaMetrics
+    sidecar:
+      dashboards:
+        enabled: true
+        label: grafana_dashboard
+        labelValue: "1"
+        folder: /tmp/dashboards
+        defaultFolderName: "General"
+        searchNamespace: ALL
+        provider:
+          allowUiUpdates: true
+          foldersFromFilesStructure: true
 
   # Exporters para métricas del clúster
   prometheus-node-exporter:
@@ -120,4 +109,5 @@ victoria-metrics-k8s-stack:
       kubernetesSystem: true
 
   # Configuración adicional para scraping
-  additionalVictoriaMetricsMap: {}
+  additionalVictoriaMetricsMap:
+    {}
